@@ -1,0 +1,30 @@
+name: Green Machine 🌿
+
+on:
+  schedule:
+    # 每小时运行一次，一天24次
+    - cron: '0 * * * *'
+  workflow_dispatch:  # 手动触发
+
+permissions:
+  contents: write
+
+jobs:
+  green:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: 种草 🌱
+        run: |
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git config user.name "${{ github.actor }}"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git pull --rebase
+          
+          # 每次运行随机提交1-5次，增加随机性
+          for i in $(seq 1 $((RANDOM % 5 + 1))); do
+            git commit --allow-empty -m "🌿 $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          done
+          
+          git push
